@@ -1,0 +1,126 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white">
+<!-- component -->
+<!-- component -->
+
+<div class="flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <div class="w-1/4 bg-white border-r border-gray-300">
+        <!-- Sidebar Header -->
+        <header class="p-4 border-b border-gray-300 flex justify-between items-center bg-indigo-600 text-white">
+            <h1 class="text-2xl font-bold">inbox</h1>
+            <a href="/"><h1 class="text-2xl font-light">home</h1></a>
+        </header>
+
+
+        <!-- Contact List -->
+        <div class="overflow-y-auto h-screen p-4 mb-10 pb-20">
+            {% for c in my_conversations %}
+                <a href="{% url 'inbox' c.id %}" class="">
+                    <div class="  {% if conversation == c %} bg-purple-700 text-white {% endif %} text-capitalize  flex items-center mb-4 cursor-pointer p-3 rounded-xl">
+                        <div class="w-12 h-15 object-fit bg-gray-300 rounded-full mr-3">
+                            {% for participant in c.participants.all %}
+                                {% if participant != request.user %}
+                                    <img src="{{ participant.profile.avatar }}" alt="User Avatar"
+                                         class="w-12 h-12 rounded-full">
+                                    </div>
+                                    <div class="flex-1">
+                                        <h2 class="text-lg font-semibold">{{ participant.profile.name }}</h2>
+                                        <p class="text-gray-600"></p>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+
+                </div>
+                 </a>
+            {% endfor %}
+    </div>
+
+</div>
+
+<!-- Main Chat Area -->
+<div class="flex-1">
+    <!-- Chat Header -->
+    <header class="bg-white p-4 text-gray-700">
+        <h1 class="text-2xl font-semibold">Alice</h1>
+    </header>
+    <div class="text-center flex flex-col items-center">
+        {% for participant in conversation.participants.all %}
+            {% if participant != request.user %}
+                <a href="{% url 'userprofile' participant.username %}"> I
+                    <img class="w-24 h-24 rounded-full object-cover mb-4" src="{{ participant.profile.avatar }}">
+                </a>
+                <div class=" text-center max-w-md">
+                <h1 class="text-lg">{{ participant.profile.name }}</h1>
+                <div class="text-gray-400 mb-2-mt-5 text-sm">@{{ participant.profile.user }}</div>
+            {% endif %}
+        {% endfor %}
+        </div>
+    </div>
+    <ul id='inbox_messages' class="flex flex-col justify-end grow gap-6 p-4 sm:p-10 pb-0">
+        {% for message in conversation.messages.all reversed %}
+            <li>
+                <div class="flex flex-col md: flex-row gap-1 md:gap-6">
+                    <a class="contents" href="{% url 'userprofile' message.sender.username %}">
+                        <img class="w-14 h-14 object-cover rounded-full"
+                             src="{{ message.sender.profile.avatar }}">
+                    </a>
+                    <div class="bg-white p-4 w-full rounded-xl border-2 shadow-xl border-green-400`">
+                        <div class="flex flex-col md:flex-row justify-between text-xs pb-3 text-zinc-500">
+                            <div>
+                                <span class="font-bold text-base text-black mr-1">{{ message.sender.profile.name }}</span>
+                            </div>
+                            <div> {{ message.created }} ({{ message.created | timesince }})</div>
+                        </div>
+                        <div> {{ message.body }}</div>
+                    </div>
+                </div>
+            </li>
+
+        {% endfor %}
+
+
+
+
+        <!-- Chat Input -->
+        <footer class="bg-white border-t border-gray-300 p-4 absolute bottom-0 w-3/4">
+            <div class="flex items-center">
+                <input type="text" placeholder="Type a message..."
+                       class="w-full p-2 rounded-md border border-gray-400 focus:outline-none focus:border-blue-500">
+                <button class="bg-indigo-500 text-white px-4 py-2 rounded-md ml-2">Send</button>
+            </div>
+        </footer>
+    </ul>
+</div>
+</div>
+<script>
+    // JavaScript for showing/hiding the menu
+    const menuButton = document.getElementById('menuButton');
+    const menuDropdown = document.getElementById('menuDropdown');
+
+    menuButton.addEventListener('click', () => {
+        if (menuDropdown.classList.contains('hidden')) {
+            menuDropdown.classList.remove('hidden');
+        } else {
+            menuDropdown.classList.add('hidden');
+        }
+    });
+
+    // Close the menu if you click outside of it
+    document.addEventListener('click', (e) => {
+        if (!menuDropdown.contains(e.target) && !menuButton.contains(e.target)) {
+            menuDropdown.classList.add('hidden');
+        }
+    });
+</script>
+
+
+</body>
+</html>
